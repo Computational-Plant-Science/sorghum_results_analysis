@@ -2,7 +2,10 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 
-def plot(df, trait):
+def clean_and_scale_data(df, trait):
+    """
+    Cleans and scales relevant numeric columns from the plant trait dataframe.
+    """
     cols_to_drop = ['file_name', 'Unnamed: 0', 'Replicate', 'Plot_Number']
     df_numeric = df.drop(columns=cols_to_drop, errors='ignore')
     
@@ -21,6 +24,9 @@ def plot(df, trait):
     return df
 
 def plot_stats(stats_df,trait):
+    """
+    Generates a bar plot comparing a specific trait across genotypes and treatments.
+    """
     fig = px.bar(
             stats_df,
             x='Genotype',
@@ -40,8 +46,8 @@ def main():
     df_li["Treat"] = 'LI'
 
     trait = 'root system bushiness'
-    stats_hi = plot(df_hi, trait)
-    stats_li = plot(df_li, trait)
+    stats_hi = clean_and_scale_data(df_hi, trait)
+    stats_li = clean_and_scale_data(df_li, trait)
 
     df_combined = pd.concat([stats_hi, stats_li], ignore_index=True)
 

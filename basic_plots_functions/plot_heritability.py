@@ -3,6 +3,9 @@ import numpy as np
 import plotly.express as px
 
 def get_statistics(df, treat_label=None):
+    """
+     Cleans data, applies scaling, and calculates trait statistics including heritability.
+    """
     cols_to_drop = ['file_name', 'Unnamed: 0', 'Replicate', 'Plot_Number', 'Genotype']
     df_numeric = df.drop(columns=cols_to_drop, errors='ignore')
 
@@ -55,7 +58,9 @@ def get_statistics(df, treat_label=None):
     return pd.DataFrame(stats)
 
 def plot_stats(stats_df, separate_by_treat=False):
-
+    """
+    Plots heritability for each trait using a bar chart.
+    """
     filtered_df = stats_df[stats_df['Trait'] != 'root system volume']
 
     if separate_by_treat:
