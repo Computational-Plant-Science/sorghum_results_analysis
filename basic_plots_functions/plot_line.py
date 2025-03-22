@@ -4,8 +4,7 @@ from sklearn.preprocessing import StandardScaler
 
 def load_and_prepare_data(file_path):
     """
-    Loads an Excel file, identifies the genotype column,
-    and separates numeric and non-numeric columns.
+    Loads an Excel file, identifies the genotype column, and separates numeric and non-numeric columns.
     """
     df = pd.read_excel(file_path)
 

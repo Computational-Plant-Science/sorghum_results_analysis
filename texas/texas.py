@@ -19,6 +19,9 @@ def combine_excels():
     return df
 
 def scale_factor(df):
+    """
+    Applies scaling factors to specific trait columns and saves the scaled dataframe.
+    """
     scaling_factors = {
         'root system diameter max': 15.1774500525728,
         'root system diameter min': 15.1774500525728,
@@ -37,7 +40,9 @@ def scale_factor(df):
 
 
 def get_statistics(df, treat_label=None):
-
+    """
+    Calculates trait-level statistics and heritability.
+    """
     stats = {
         'Trait': [],
         'Variance': [],
@@ -72,7 +77,9 @@ def get_statistics(df, treat_label=None):
     return pd.DataFrame(stats)
 
 def plot_stats(stats_df):
-
+    """
+    Plots heritability (H²) for each trait in a bar chart.
+    """
     # filtered_df = stats_df[stats_df['Trait'] != 'root system volume']
 
     fig = px.bar(
