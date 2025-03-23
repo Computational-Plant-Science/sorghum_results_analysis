@@ -12,7 +12,7 @@ def load_and_prepare_data(file_path):
     genotype_column = 'Genotype' if 'Genotype' in non_numeric_columns else non_numeric_columns[0]
     genotype_values = df[genotype_column]
 
-    df = df.drop(columns=['Plot_Number'], errors='ignore')
+    df = df.drop(columns=['Plot_Number', 'Unnamed: 0'], errors='ignore')
     df_numeric = df.drop(columns=non_numeric_columns, errors='ignore')
 
     scaler = StandardScaler()
@@ -40,8 +40,8 @@ def plot_normalized_traits(df_normalized, treat_label):
     fig.show()
 
 def main():
-    file_path_hi = "./average_trait_values/traits_and_sorghums_HI_avg.xlsx"
-    file_path_li = "./average_trait_values/traits_and_sorghums_LI_avg.xlsx"
+    file_path_hi = "trait_excels/average_trait_values/traits_and_sorghums_HI_avg.xlsx"
+    file_path_li = "trait_excels/average_trait_values/traits_and_sorghums_LI_avg.xlsx"
 
     df_hi_normalized = load_and_prepare_data(file_path_hi)
     df_li_normalized = load_and_prepare_data(file_path_li)

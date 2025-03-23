@@ -57,11 +57,14 @@ def get_statistics(df, treat_label=None):
 
     return pd.DataFrame(stats)
 
-def plot_stats(stats_df, separate_by_treat=False):
+def plot_stats(stats_df, separate_by_treat=False, max_error=5):
     """
     Plots heritability for each trait using a bar chart.
     """
-    filtered_df = stats_df[stats_df['Trait'] != 'root system volume']
+    # filtered_df = stats_df[stats_df['Trait'] != 'root system volume']
+    filtered_df = stats_df.copy()
+
+    filtered_df['Ve (Error Variance)'] = filtered_df['Ve (Error Variance)'].clip(upper=max_error)
 
     if separate_by_treat:
         fig = px.bar(
@@ -87,20 +90,23 @@ def plot_stats(stats_df, separate_by_treat=False):
     fig.show()
 
 def main():
-    file_path = "traits_and_sorghums.xlsx"
+    # file_path = "trait_excels/traits_and_sorghums.xlsx"
+    file_path = "texas/combined_trait_results_texas_scaled_cleaned.xlsx"
     df = pd.read_excel(file_path)
     stats_overall = get_statistics(df)
     plot_stats(stats_overall, separate_by_treat=False)
 
-    df_hi = pd.read_excel("./average_trait_values/traits_and_sorghums_HI.xlsx")
-    df_li = pd.read_excel("./average_trait_values/traits_and_sorghums_LI.xlsx")
+    # df_hi = pd.read_excel("trait_excels/average_trait_values/traits_and_sorghums_HI_avg.xlsx")
+    # df_li = pd.read_excel("trait_excels/average_trait_values/traits_and_sorghums_LI_avg.xlsx")
+    df = pd.read_excel("texas/combined_trait_results_texas_scaled_cleaned.xlsx")
 
-    stats_hi = get_statistics(df_hi, treat_label='HI')
-    stats_li = get_statistics(df_li, treat_label='LI')
+    # stats_hi = get_statistics(df_hi, treat_label='HI')
+    # stats_li = get_statistics(df_li, treat_label='LI')
+    stats = get_statistics(df)
 
-    df_combined = pd.concat([stats_hi, stats_li], ignore_index=True)
+    # df_combined = pd.concat([stats_hi, stats_li], ignore_index=True)
 
-    plot_stats(df_combined, separate_by_treat=True)
+    plot_stats(stats, separate_by_treat=True)
 
 if __name__ == '__main__':
     main()
