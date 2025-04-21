@@ -24,10 +24,12 @@ def replace_outliers(df, threshold=1.5):
     return df_cleaned
 
 def main():
-    file_name = "./texas/combined_trait_results_texas_scaled.xlsx"
+    # file_name = "./texas/combined_trait_results_texas_scaled.xlsx"
+    file_name = "./arizona/combined_trait_results_arizona_scaled.xlsx"
     df = load_df(file_name)
     df_replaced = replace_outliers(df)
-    df_replaced.to_excel("./combined_trait_results_texas_scaled_cleaned.xlsx")
+    # df_replaced.to_excel("./combined_trait_results_texas_scaled_cleaned.xlsx")
+    df_replaced.to_excel("./combined_trait_results_arizona_scaled_cleaned.xlsx")
 
 if __name__ == '__main__':
     main()

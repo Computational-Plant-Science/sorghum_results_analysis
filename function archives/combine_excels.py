@@ -6,7 +6,8 @@ def combine_excels():
     """
     Grabs all files in ./trait_results and combines them into one excel sheet.
     """
-    l = [pd.read_excel(filename) for filename in glob.glob("./trait_results/*.xlsx")]
+    l = [pd.read_excel(filename) for filename in glob.glob("./trait_excels/trait_results/*.xlsx")]
+    print(l)
 
     df = pd.concat(l, axis=0)
     df = df.drop('Unnamed: 0', axis=1)
