@@ -3,6 +3,28 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 
+def normalize_condition_labels(df):
+    mapping = {
+        'well_watered': 'HI',
+        'well watered': 'HI',
+        'ww': 'HI',
+        'hi': 'HI',
+        'water_limited': 'LI',
+        'water limited': 'LI',
+        'wl': 'LI',
+        'li': 'LI'
+    }
+    df['Condition'] = (
+        df['Condition']
+        .astype(str)
+        .str.lower()
+        .str.strip()
+        .replace(mapping)
+        .str.upper()
+    )
+    return df
+
+
 def get_statistics(df, treat_label=None, n_replicates=80):
     """
     Computes statistical metrics for each numeric trait including estimated heritability (H2).
@@ -65,6 +87,7 @@ def plot_heritability(
     - max_error (float): Maximum error bar value (for clipping).
     """
     df = pd.read_excel(input_file)
+    df = normalize_condition_labels(df)
 
     if separate_by_treat:
         df_hi = df[df['Condition'] == 'HI']

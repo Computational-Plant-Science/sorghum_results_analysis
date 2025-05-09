@@ -2,6 +2,28 @@ import argparse
 import pandas as pd
 import plotly.express as px
 
+def normalize_condition_labels(df):
+    mapping = {
+        'well_watered': 'HI',
+        'well watered': 'HI',
+        'ww': 'HI',
+        'hi': 'HI',
+        'water_limited': 'LI',
+        'water limited': 'LI',
+        'wl': 'LI',
+        'li': 'LI'
+    }
+    df['Condition'] = (
+        df['Condition']
+        .astype(str)
+        .str.lower()
+        .str.strip()
+        .replace(mapping)
+        .str.upper()
+    )
+    return df
+
+
 def compute_trait_by_region(file_path, trait, genotype, region_label="Region", sheet_name="Sheet1"):
     """
     Extracts and averages a single trait by condition for a specific genotype and region from an Excel file.
@@ -108,26 +130,31 @@ def plot_all_traits(df, genotype):
     fig.show()
 
 def main():
-    """
-    Parses command-line arguments and plots either a specific trait or all traits for a given genotype.
-    """
-    parser = argparse.ArgumentParser(description="Compare traits by genotype and region.")
-    parser.add_argument("--genotype", required=True, help="Genotype name (e.g. SC56)")
-    parser.add_argument("--trait", help="Single trait to plot (leave blank to plot all traits)")
-    parser.add_argument("--file1", help="Cleaned Excel file 1")
-    parser.add_argument("--file2", help="Cleaned Excel file 2")
-
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--genotype", required=True, help="Genotype name")
+    parser.add_argument("--trait", help="Single trait to plot")
+    parser.add_argument("--file1", required=True, help="Excel file for region 1")
+    parser.add_argument("--file2", required=True, help="Excel file for region 2")
+    parser.add_argument("--region1", required=True, help="Label for region 1")
+    parser.add_argument("--region2", required=True, help="Label for region 2")
     args = parser.parse_args()
-
     if args.trait:
-        df_az = compute_trait_by_region(args.file1, args.trait, args.genotype, region_label="Arizona")
-        df_tx = compute_trait_by_region(args.file2, args.trait, args.genotype, region_label="Texas")
-        df_combined = pd.concat([df_az, df_tx], ignore_index=True)
+        df1 = normalize_condition_labels(
+            compute_trait_by_region(args.file1, args.trait, args.genotype, region_label=args.region1)
+        )
+        df2 = normalize_condition_labels(
+            compute_trait_by_region(args.file2, args.trait, args.genotype, region_label=args.region2)
+        )
+        df_combined = pd.concat([df1, df2], ignore_index=True)
         plot_raw_trait(df_combined, args.trait, args.genotype)
     else:
-        df_az_all = compute_all_traits_by_region(args.file1, args.genotype, region_label="Arizona")
-        df_tx_all = compute_all_traits_by_region(args.file2, args.genotype, region_label="Texas")
-        df_combined = pd.concat([df_az_all, df_tx_all], ignore_index=True)
+        df1_all = normalize_condition_labels(
+            compute_all_traits_by_region(args.file1, args.genotype, region_label=args.region1)
+        )
+        df2_all = normalize_condition_labels(
+            compute_all_traits_by_region(args.file2, args.genotype, region_label=args.region2)
+        )
+        df_combined = pd.concat([df1_all, df2_all], ignore_index=True)
         plot_all_traits(df_combined, args.genotype)
 
 if __name__ == '__main__':

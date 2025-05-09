@@ -2,6 +2,27 @@ import argparse
 import pandas as pd
 import plotly.express as px
 
+def normalize_condition_labels(df):
+    mapping = {
+        'well_watered': 'HI',
+        'well watered': 'HI',
+        'ww': 'HI',
+        'hi': 'HI',
+        'water_limited': 'LI',
+        'water limited': 'LI',
+        'wl': 'LI',
+        'li': 'LI'
+    }
+    df['Condition'] = (
+        df['Condition']
+        .astype(str)
+        .str.lower()
+        .str.strip()
+        .replace(mapping)
+        .str.upper()
+    )
+    return df
+
 def prepare_fully_scaled_data(df, scale='zscore'):
     """
     Prepares and reshapes the data for plotting by scaling numeric traits
@@ -109,11 +130,12 @@ def main():
     p.add_argument('--out', help='Path to save plot image (adds _HI/_LI suffixes)')
     p.add_argument('--top', type=int, help='Highlight top N most variable genotypes')
     p.add_argument('--scale', choices=['zscore', 'minmax'], default='zscore', help='Scaling method for traits')
-    p.add_argument('--region', default='Texas', help='Region label in plot title')
+    p.add_argument('--region', help='Region label in plot title')
 
     args = p.parse_args()
 
     df = pd.read_excel(args.input)
+    df = normalize_condition_labels(df)
     df_long = prepare_fully_scaled_data(df, scale=args.scale)
 
     for cond in ['HI', 'LI']:

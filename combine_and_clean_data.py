@@ -85,29 +85,39 @@ def combine_excels(file_pattern, metadata_path):
 
     for filename in file_list:
         df_temp = pd.read_excel(filename)
-        base_filename = os.path.basename(filename).rsplit('.', 1)[0]
-        base_filename = re.sub(r'^[A-Za-z]_', '', base_filename)
-        df_temp['filename'] = base_filename
+        base = os.path.basename(filename).rsplit('.', 1)[0]
+
+        # find all digit-runs, pick the longest (e.g. "1104" over "1")
+        nums = re.findall(r'\d+', base)
+        if not nums:
+            raise ValueError(f"Could not extract any digits from filename: {base}")
+        plot_number = max(nums, key=len)
+
+        df_temp['plot_number'] = plot_number
         data_frames.append(df_temp)
 
     if not data_frames:
         raise ValueError("No files found matching the pattern: " + file_pattern)
 
-    combined_df = pd.concat(data_frames, axis=0, ignore_index=True)
+    combined_df = pd.concat(data_frames, ignore_index=True)
     combined_df = combined_df.drop(columns=['Unnamed: 0'], errors='ignore')
-    combined_df['plot_number'] = combined_df['filename'].astype(str).apply(lambda x: x.split('_')[0])
 
+    # average numeric columns per plot
     numeric_cols = combined_df.select_dtypes(include='number').columns.tolist()
-    averaged_df = combined_df.groupby('plot_number')[numeric_cols].mean().reset_index()
+    averaged_df = combined_df.groupby('plot_number', as_index=False)[numeric_cols].mean()
 
-    metadata_df = pd.read_excel(metadata_path)
+    # merge with metadata
+    metadata_df  = pd.read_excel(metadata_path)
     metadata_long = process_metadata(metadata_df)
     metadata_long['Genotype'] = metadata_long['Genotype'].str.replace('.', '', regex=False)
 
-    merged_df = pd.merge(averaged_df, metadata_long, on='plot_number', how='left')
+    merged_df = pd.merge(averaged_df,
+                         metadata_long,
+                         on='plot_number',
+                         how='left')
+
     group_cols = ['Genotype'] + (['Condition'] if 'Condition' in merged_df.columns else [])
     final_df = merged_df.groupby(group_cols, as_index=False)[numeric_cols].mean()
-
     return final_df
 
 def scale_factor(df):
