@@ -195,7 +195,7 @@ def parse_args():
     p = argparse.ArgumentParser(description="Combine, scale, and clean trait Excel files using metadata.")
     p.add_argument('--input-dir', default='data/raw', help="Folder containing raw Excel trait files")
     p.add_argument('--metadata',  default='data/meta.xlsx', help="Metadata file (Excel)")
-    p.add_argument('--output',    default='results/cleaned.xlsx', help="Path to save the final cleaned file")
+    p.add_argument('--output',    default="/srv/data/cleaned.xlsx", help="Path to save the final cleaned file")
     return p.parse_args()
 
 if __name__ == '__main__':
